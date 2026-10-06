@@ -1,0 +1,12 @@
+{
+  "name": "easy-jwt",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Generate strong JWT secrets and decode / verify JWTs in the browser",
+  "scripts": {
+    "start": "node scripts/serve.js",
+    "build": "node scripts/build.js",
+    "config": "node scripts/env.js"
+  },
+  "engines": { "node": ">=16" }
+}
