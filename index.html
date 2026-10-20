@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Easy JWT</title>
+<meta name="description" content="Easy JWT: generate strong JWT secrets instantly and decode / verify JWT tokens right in your browser.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Ctext x='32' y='44' font-family='Impact,Arial Black,Arial' font-weight='900' font-size='32' text-anchor='middle' fill='%23ff2a2f'%3EJ%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="assets/inter-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/inter-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/digits.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/logo-jwt.webp" as="image">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-copy" viewBox="0 0 48 46"><rect x="17" y="13" width="20" height="24" rx="4"/><path d="M12 31V12a4 4 0 0 1 4-4h14"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 48 46"><path d="M8 23s6-10 16-10 16 10 16 10-6 10-16 10S8 23 8 23z"/><circle cx="24" cy="23" r="4.5"/></symbol>
+    <symbol id="i-eye-off" viewBox="0 0 48 46"><path d="M8 23s6-10 16-10 16 10 16 10-6 10-16 10S8 23 8 23z"/><circle cx="24" cy="23" r="4.5"/><path d="M11 36L37 10"/></symbol>
+    <symbol id="i-check" viewBox="0 0 48 46"><path d="M13 24l7 7 15-16"/></symbol>
+    <symbol id="i-key" viewBox="0 0 48 46"><circle cx="17" cy="23" r="7"/><path d="M24 23h15M34 23v6M39 23v5"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 1.5l3.1 7.3 7.9.7-6 5.2 1.8 7.7L12 18.4l-6.8 4 1.8-7.7-6-5.2 7.9-.7z"/></symbol>
+  </defs>
+</svg>
+
+<div id="grain" aria-hidden="true"></div>
+<div id="glow" aria-hidden="true"></div>
+<div id="decor" aria-hidden="true"></div>
+
+<div id="app" data-page="gen">
+
+  <header class="nav" aria-label="Main">
+    <nav class="nav-in">
+      <a href="#/" class="nl" data-route="gen" aria-label="JWT keys">JWT</a>
+      <a href="#/decoder" class="nl" data-route="dec" aria-label="Decoder">DECODE</a>
+      <a href="#/about" class="nl" data-route="about" aria-label="About">ABOUT</a>
+      <span class="nav-ind" aria-hidden="true"></span>
+    </nav>
+  </header>
+
+  <main>
+  <!-- ================= JWT KEY (generator) ================= -->
+  <section class="page" data-page="gen" aria-label="JWT key generator">
+    <h1 class="hero" aria-label="JWT KEYS">
+      <img class="gl gl-a" src="assets/logo-jwt.webp" alt="" aria-hidden="true">
+      <img class="gl gl-b" src="assets/logo-jwt.webp" alt="" aria-hidden="true">
+      <img class="logo" src="assets/logo-jwt.webp" width="1200" height="487" alt="JWT KEYS" fetchpriority="high">
+    </h1>
+    <p class="tagline"><span>Generate</span><i class="star"><svg><use href="#i-star"/></svg></i><span>Copy</span><i class="star"><svg><use href="#i-star"/></svg></i><span>Secure</span></p>
+
+    <div class="cards">
+      <div class="card" data-kind="std">
+        <div class="c-head"><div class="c-title">Standard key</div><div class="c-sub">Alphanumeric only</div></div>
+        <div class="chips" role="radiogroup" aria-label="Key length"></div>
+        <div class="slider" role="slider" tabindex="0" aria-label="Key length" aria-valuemin="128" aria-valuemax="512"><div class="track"><i class="fill"></i></div><div class="thumb"></div></div>
+        <div class="lbls"><span>128</span><span>512</span></div>
+        <div class="out"><div class="out-text masked" aria-live="polite"></div><button class="icon-btn eye" aria-label="Show key" aria-pressed="false" title="Show / hide key"><svg class="ic-eye"><use href="#i-eye"/></svg><svg class="ic-eye-off"><use href="#i-eye-off"/></svg></button><button class="icon-btn copy" aria-label="Copy key"><svg class="ic-copy"><use href="#i-copy"/></svg><svg class="ic-check"><use href="#i-check"/></svg></button></div>
+        <button class="btn gen"><span class="btn-t">Generate key</span></button>
+      </div>
+
+      <div class="card" data-kind="enh">
+        <div class="c-head"><div class="c-title">Enhanced key</div><div class="c-sub">With special characters</div></div>
+        <div class="chips" role="radiogroup" aria-label="Key length"></div>
+        <div class="slider" role="slider" tabindex="0" aria-label="Key length" aria-valuemin="128" aria-valuemax="512"><div class="track"><i class="fill"></i></div><div class="thumb"></div></div>
+        <div class="lbls"><span>128</span><span>512</span></div>
+        <div class="out"><div class="out-text masked" aria-live="polite"></div><button class="icon-btn eye" aria-label="Show key" aria-pressed="false" title="Show / hide key"><svg class="ic-eye"><use href="#i-eye"/></svg><svg class="ic-eye-off"><use href="#i-eye-off"/></svg></button><button class="icon-btn copy" aria-label="Copy key"><svg class="ic-copy"><use href="#i-copy"/></svg><svg class="ic-check"><use href="#i-check"/></svg></button></div>
+        <button class="btn gen"><span class="btn-t">Generate key</span></button>
+      </div>
+    </div>
+
+    <div class="counter" data-counter="gen"><div class="odo" aria-hidden="true"></div><div class="counter-lbl">Total Number of Keys Generated</div></div>
+  </section>
+
+  <!-- ================= DECODER ================= -->
+  <section class="page" data-page="dec" aria-label="JWT decoder" hidden>
+    <h1 class="hero hero-dec" aria-label="Decoder">
+      <img class="gl gl-a" src="assets/logo-dec.webp" alt="" aria-hidden="true">
+      <img class="gl gl-b" src="assets/logo-dec.webp" alt="" aria-hidden="true">
+      <img class="logo" src="assets/logo-dec.webp" width="1200" height="440" alt="Decoder">
+    </h1>
+    <p class="tagline"><span>Paste</span><i class="star"><svg><use href="#i-star"/></svg></i><span>Decode</span><i class="star"><svg><use href="#i-star"/></svg></i><span>Verify</span></p>
+
+    <div class="cards">
+      <div class="card" id="dec-in">
+        <div class="c-head"><div class="c-title">Encoded token</div><button class="c-sub c-link" id="dec-sample">Try a sample token</button></div>
+        <div class="tok">
+          <pre class="tok-hl" aria-hidden="true"></pre>
+          <textarea id="tok" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Paste a JWT here: header.payload.signature" aria-label="Encoded JWT"></textarea>
+        </div>
+        <div class="out sec"><input id="secret" type="text" spellcheck="false" autocomplete="off" placeholder="Secret to verify signature (optional)" aria-label="Secret"><button class="icon-btn" id="use-key" aria-label="Use last generated key" title="Use last generated key"><svg><use href="#i-key"/></svg></button></div>
+        <button class="btn" id="dec-btn"><span class="btn-t">Decode</span></button>
+      </div>
+
+      <div class="card" id="dec-out">
+        <div class="c-head"><div class="c-title">Decoded</div><div class="c-sub">Header · Payload</div></div>
+        <div class="pane pane-h"><span class="pane-tag">HEADER</span><pre id="o-head"></pre></div>
+        <div class="pane pane-p"><span class="pane-tag">PAYLOAD</span><pre id="o-pay"></pre></div>
+        <div class="stats">
+          <div class="stat" id="st-alg"><b>ALG</b><span>—</span></div>
+          <div class="stat" id="st-sig"><b>SIGNATURE</b><span>—</span></div>
+          <div class="stat" id="st-exp"><b>EXPIRY</b><span>—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="counter" data-counter="dec"><div class="odo" aria-hidden="true"></div><div class="counter-lbl">Total Number of Tokens Decoded</div></div>
+  </section>
+
+  <!-- ================= ABOUT ================= -->
+  <section class="page" data-page="about" aria-label="About" hidden>
+    <div class="ill"><img src="assets/banner.webp" width="1408" height="608" alt="Developer relaxing with coffee: Generating JWT keys is easy now" decoding="async"><i class="bub" aria-hidden="true"></i></div>
+    <div class="about-txt">
+      <p class="a1">Generating JWT keys the traditional way can be tedious and time-consuming.<br>With EASY JWT, you can generate secure, strong JWT secrets instantly without manually creating or configuring them.</p>
+      <p class="a2">Simply choose your preferred key length, generate your key, and copy it with a single click. EASY JWT makes the process faster, simpler, and safer for developers working with authentication and APIs.<br>Generate. Copy. Secure.<br>Your JWT secret, ready in seconds.</p>
+    </div>
+    <div class="socials">
+      <a class="so" data-so="phone" aria-label="Call"><img src="assets/ic0.webp" alt="" width="134" height="134"></a>
+      <a class="so so-wa" data-so="whatsapp" aria-label="WhatsApp" target="_blank" rel="noopener"><img src="assets/ic1.webp" alt="" width="144" height="144"></a>
+      <a class="so" data-so="instagram" aria-label="Instagram" target="_blank" rel="noopener"><img src="assets/ic2.webp" alt="" width="136" height="136"></a>
+      <a class="so" data-so="email" aria-label="Email"><img src="assets/ic3.webp" alt="" width="136" height="136"></a>
+    </div>
+  </section>
+  </main>
+
+  <div class="ticker" aria-hidden="true"><div class="ticker-in"></div></div>
+</div>
+
+<div id="wipe" aria-hidden="true"><i></i><i></i></div>
+<canvas id="burst" aria-hidden="true"></canvas>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="cur" aria-hidden="true"><i class="cd"></i><i class="cr"></i></div>
+
+<script src="config.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>
