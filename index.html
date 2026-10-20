@@ -25,9 +25,6 @@
   </defs>
 </svg>
 
-<div id="grain" aria-hidden="true"></div>
-<div id="glow" aria-hidden="true"></div>
-<div id="decor" aria-hidden="true"></div>
 
 <div id="app" data-page="gen">
 
@@ -44,8 +41,6 @@
   <!-- ================= JWT KEY (generator) ================= -->
   <section class="page" data-page="gen" aria-label="JWT key generator">
     <h1 class="hero" aria-label="JWT KEYS">
-      <img class="gl gl-a" src="assets/logo-jwt.webp" alt="" aria-hidden="true">
-      <img class="gl gl-b" src="assets/logo-jwt.webp" alt="" aria-hidden="true">
       <img class="logo" src="assets/logo-jwt.webp" width="1200" height="487" alt="JWT KEYS" fetchpriority="high">
     </h1>
     <p class="tagline"><span>Generate</span><i class="star"><svg><use href="#i-star"/></svg></i><span>Copy</span><i class="star"><svg><use href="#i-star"/></svg></i><span>Secure</span></p>
@@ -69,15 +64,11 @@
         <button class="btn gen"><span class="btn-t">Generate key</span></button>
       </div>
     </div>
-
-    <div class="counter" data-counter="gen"><div class="odo" aria-hidden="true"></div><div class="counter-lbl">Total Number of Keys Generated</div></div>
   </section>
 
   <!-- ================= DECODER ================= -->
   <section class="page" data-page="dec" aria-label="JWT decoder" hidden>
     <h1 class="hero hero-dec" aria-label="Decoder">
-      <img class="gl gl-a" src="assets/logo-dec.webp" alt="" aria-hidden="true">
-      <img class="gl gl-b" src="assets/logo-dec.webp" alt="" aria-hidden="true">
       <img class="logo" src="assets/logo-dec.webp" width="1200" height="440" alt="Decoder">
     </h1>
     <p class="tagline"><span>Paste</span><i class="star"><svg><use href="#i-star"/></svg></i><span>Decode</span><i class="star"><svg><use href="#i-star"/></svg></i><span>Verify</span></p>
@@ -104,13 +95,10 @@
         </div>
       </div>
     </div>
-
-    <div class="counter" data-counter="dec"><div class="odo" aria-hidden="true"></div><div class="counter-lbl">Total Number of Tokens Decoded</div></div>
   </section>
 
   <!-- ================= ABOUT ================= -->
   <section class="page" data-page="about" aria-label="About" hidden>
-    <div class="ill"><img src="assets/banner.webp" width="1408" height="608" alt="Developer relaxing with coffee: Generating JWT keys is easy now" decoding="async"><i class="bub" aria-hidden="true"></i></div>
     <div class="about-txt">
       <p class="a1">Generating JWT keys the traditional way can be tedious and time-consuming.<br>With EASY JWT, you can generate secure, strong JWT secrets instantly without manually creating or configuring them.</p>
       <p class="a2">Simply choose your preferred key length, generate your key, and copy it with a single click. EASY JWT makes the process faster, simpler, and safer for developers working with authentication and APIs.<br>Generate. Copy. Secure.<br>Your JWT secret, ready in seconds.</p>
@@ -123,14 +111,10 @@
     </div>
   </section>
   </main>
-
-  <div class="ticker" aria-hidden="true"><div class="ticker-in"></div></div>
 </div>
 
 <div id="wipe" aria-hidden="true"><i></i><i></i></div>
-<canvas id="burst" aria-hidden="true"></canvas>
 <div id="toast" role="status" aria-live="polite"></div>
-<div id="cur" aria-hidden="true"><i class="cd"></i><i class="cr"></i></div>
 
 <script src="config.js" defer></script>
 <script src="app.js" defer></script>

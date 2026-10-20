@@ -58,55 +58,6 @@ function toast(msg, err) {
   restart(t, 'show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1900);
 }
 
-/* ================= particle burst ================= */
-const cv = $('#burst'), cx = cv.getContext('2d');
-let parts = [], running = false, dpr = 1;
-function sizeCanvas() { dpr = Math.min(devicePixelRatio || 1, 2); cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; }
-sizeCanvas(); addEventListener('resize', sizeCanvas, { passive: true });
-function burst(el, colors, n = 70) {
-  if (reduce) return;
-  const r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
-  const glyphs = '{}[]01#$%&*<>/=+JWT';
-  for (let i = 0; i < n; i++) {
-    const a = -Math.PI / 2 + (Math.random() - .5) * Math.PI * 1.6, v = 5 + Math.random() * 11;
-    parts.push({ x: x + (Math.random() - .5) * r.width * .6, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v,
-      g: glyphs[(Math.random() * glyphs.length) | 0], c: colors[(Math.random() * colors.length) | 0],
-      s: 12 + Math.random() * 16, r: Math.random() * 6, vr: (Math.random() - .5) * .4, life: 1, d: .012 + Math.random() * .014, sq: Math.random() < .35 });
-  }
-  if (!running) { running = true; raf(tick); }
-}
-function tick() {
-  cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, innerWidth, innerHeight);
-  parts = parts.filter(p => p.life > 0);
-  for (const p of parts) {
-    p.vy += .32; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life -= p.d;
-    cx.save(); cx.globalAlpha = Math.max(p.life, 0); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c;
-    if (p.sq) { cx.fillRect(-p.s / 4, -p.s / 4, p.s / 2, p.s / 2); }
-    else { cx.font = `700 ${p.s}px "JetBrains Mono",monospace`; cx.fillText(p.g, -p.s / 3, p.s / 3); }
-    cx.restore();
-  }
-  if (parts.length) raf(tick); else { running = false; cx.clearRect(0, 0, innerWidth, innerHeight); }
-}
-
-/* ================= odometer counters ================= */
-function odo(el, value) {
-  const str = String(value).padStart(2, '0');
-  let cols = $$('.odo-d', el);
-  while (cols.length < str.length) {
-    const d = document.createElement('span'); d.className = 'odo-d';
-    d.innerHTML = '<span class="odo-s">' + [...'0123456789'].map(n => `<span>${n}</span>`).join('') + '</span>';
-    el.prepend(d); cols = $$('.odo-d', el);
-  }
-  while (cols.length > str.length) { cols[0].remove(); cols = $$('.odo-d', el); }
-  cols.forEach((c, i) => { c.firstChild.style.transform = `translateY(${-str[i]}em)`; c.firstChild.style.transitionDelay = (str.length - 1 - i) * 80 + 'ms'; });
-  el.closest('.counter').setAttribute('aria-label', value);
-}
-function bumpCounter(kind) {
-  const n = store.get(kind, 0) + 1; store.set(kind, n);
-  const c = $(`[data-counter="${kind}"]`), o = $('.odo', c);
-  odo(o, n); restart(o, 'bump'); restart(c, 'ring');
-}
-
 /* ================= generator cards ================= */
 let lastKey = '';
 function scramble(el, text, set, after = '') {
@@ -184,15 +135,13 @@ $$('.card[data-kind]').forEach(card => {
     key = randStr(STOPS[idx], set); lastKey = key; store.set('last', key);
     restart(gen, 'press'); restart(out, 'flash');
     shown = false; render();
-    burst(gen, ['#ff2a2f', '#ffffff', '#ff2a2f', '#a50f16']);
-    bumpCounter('gen');
   });
   const doCopy = async () => {
     if (!key) { toast('Generate a key first', true); restart(card, 'shake'); return; }
     if (await copyText(key)) {
       copyBtn.classList.remove('done'); void copyBtn.offsetWidth; copyBtn.classList.add('done');
       setTimeout(() => copyBtn.classList.remove('done'), 1600);
-      toast(`Copied ${key.length}-character key`); burst(copyBtn, ['#ff2a2f', '#fff'], 24);
+      toast(`Copied ${key.length}-character key`);
     } else toast('Copy failed: select the key manually', true);
   };
   copyBtn.addEventListener('click', doCopy);
@@ -268,7 +217,6 @@ async function verify(parts, header) {
     const k = await crypto.subtle.importKey('raw', enc.encode(secret.value), { name: 'HMAC', hash: HASH[alg] }, false, ['verify']);
     const ok = await crypto.subtle.verify('HMAC', k, b64uBytes(parts[2] || ''), enc.encode(parts[0] + '.' + parts[1]));
     setStat(stSig, ok ? 'Verified ✓' : 'Invalid signature', ok ? 'ok' : 'bad');
-    if (ok) burst(stSig, ['#ff2a2f', '#fff'], 22);
   } catch { setStat(stSig, 'Invalid signature', 'bad'); }
 }
 function decode(opts = {}) {
@@ -297,7 +245,7 @@ function decode(opts = {}) {
     if (typeof payload.nbf === 'number' && payload.nbf > now) setStat(stExp, 'Active in ' + rel(payload.nbf - now), 'mid');
     else if (typeof payload.exp === 'number') setStat(stExp, payload.exp < now ? 'Expired ' + rel(now - payload.exp) + ' ago' : 'Valid ' + rel(payload.exp - now), payload.exp < now ? 'bad' : 'ok');
     else setStat(stExp, 'No expiry', 'mid');
-    if (decodedOnce !== v) { decodedOnce = v; bumpCounter('dec'); }
+   
   }
   verify(parts, header);
   return true;
@@ -308,7 +256,7 @@ secret.addEventListener('input', () => { clearTimeout(decT); decT = setTimeout((
 $('#dec-btn').addEventListener('click', e => {
   restart(e.currentTarget, 'press');
   if (!tok.value.trim()) { toast('Paste a JWT first', true); restart($('#dec-in'), 'shake'); return; }
-  if (decode({ loud: true, force: true })) burst(e.currentTarget, ['#ff2a2f', '#ff6b6f', '#fff']);
+  decode({ loud: true, force: true });
 });
 $('#use-key').addEventListener('click', () => {
   const k = lastKey || store.get('last', '');
@@ -331,7 +279,7 @@ $('#dec-sample').addEventListener('click', async () => {
   let i = 0; const stepN = Math.ceil(full.length / 34);
   (function type() {
     i = Math.min(full.length, i + stepN); tok.value = full.slice(0, i); highlight();
-    if (i < full.length) raf(type); else { decode({ force: true }); burst($('#dec-btn'), ['#ff2a2f', '#ff6b6f', '#fff'], 40); }
+    if (i < full.length) raf(type); else { decode({ force: true }); }
   })();
 });
 
@@ -381,92 +329,9 @@ function route() {
 }
 addEventListener('hashchange', route);
 
-/* ================= pointer FX: tilt, glow, cursor, magnet ================= */
-const decor = $('#decor'), glow = $('#glow'), cur = $('#cur'), cd = $('.cd', cur), cr = $('.cr', cur);
-let mx = innerWidth / 2, my = -200, rx = mx, ry = my, curLoop = false;
-function curTick() {
-  rx += (mx - rx) * .2; ry += (my - ry) * .2;
-  cd.style.transform = `translate(${mx}px,${my}px)`; cr.style.transform = `translate(${rx}px,${ry}px)`;
-  if (Math.abs(mx - rx) + Math.abs(my - ry) > .3) raf(curTick); else curLoop = false;
-}
-let gPending = false;
-addEventListener('pointermove', e => {
-  mx = e.clientX; my = e.clientY;
-  decor.style.setProperty('--mx', (innerWidth / 2 - mx).toFixed(0) + 'px'); decor.style.setProperty('--my', (innerHeight / 2 - my).toFixed(0) + 'px');
-  if (!gPending) { gPending = true; raf(() => { glow.style.setProperty('--gx', mx + 'px'); glow.style.setProperty('--gy', my + 'px'); gPending = false; }); }
-  if (!curLoop && !reduce) { curLoop = true; raf(curTick); }
-}, { passive: true });
-document.addEventListener('pointerover', e => cur.classList.toggle('hov', !!e.target.closest('a,button,.slider,textarea,input')));
-addEventListener('pointerdown', () => cur.classList.add('down'));
-addEventListener('pointerup', () => cur.classList.remove('down'));
-document.addEventListener('pointerleave', () => { mx = -100; my = -100; if (!curLoop) { curLoop = true; raf(curTick); } });
-
-if (!reduce && matchMedia('(pointer:fine)').matches) {
-  $$('.card, .ill').forEach(el => {
-    const tgt = el.classList.contains('ill') ? $('img', el) : el;
-    let p = false, ev;
-    el.addEventListener('pointermove', e => {
-      ev = e; if (p) return; p = true;
-      raf(() => {
-        p = false; const r = el.getBoundingClientRect(), px = (ev.clientX - r.left) / r.width, py = (ev.clientY - r.top) / r.height;
-        if (el.classList.contains('slider')) return;
-        if (el.classList.contains('ill')) {
-          el.style.setProperty('--px', ((.5 - px) * 30).toFixed(1) + 'px'); el.style.setProperty('--py', ((.5 - py) * 18).toFixed(1) + 'px');
-          return;
-        }
-        const amp = 4;
-        tgt.style.setProperty('--ry', ((px - .5) * amp).toFixed(2) + 'deg');
-        tgt.style.setProperty('--rx', ((.5 - py) * amp).toFixed(2) + 'deg');
-        el.style.setProperty('--mx', (px * 100).toFixed(1) + '%'); el.style.setProperty('--my', (py * 100).toFixed(1) + '%');
-      });
-    });
-    el.addEventListener('pointerleave', () => { tgt.style.setProperty('--rx', '0deg'); tgt.style.setProperty('--ry', '0deg'); el.style.setProperty('--px', '0px'); el.style.setProperty('--py', '0px'); });
-  });
-  $$('.btn').forEach(b => {
-    b.addEventListener('pointermove', e => {
-      const r = b.getBoundingClientRect();
-      b.style.translate = `${((e.clientX - r.left) / r.width - .5) * 16}px ${((e.clientY - r.top) / r.height - .5) * 12}px`;
-    });
-    b.addEventListener('pointerleave', () => { b.style.translate = ''; });
-  });
-}
-
-/* ================= decor: floating stars + dots, marquee ticker ================= */
-(() => {
-  const d = $('#decor'), n = innerWidth < 700 ? 12 : 22;
-  for (let i = 0; i < n; i++) {
-    const star = i % 3 === 0, sz = star ? 14 + Math.random() * 22 : 4 + Math.random() * 7, e = document.createElement('i');
-    e.className = 'd' + (star ? '' : ' dot');
-    if (star) e.innerHTML = '<svg><use href="#i-star"/></svg>';
-    const st = e.style;
-    st.left = (Math.random() * 96).toFixed(1) + '%'; st.top = (Math.random() * 96).toFixed(1) + '%';
-    st.width = st.height = sz.toFixed(1) + 'px';
-    st.setProperty('--z', ((.2 + Math.random()) * (star ? .06 : .03)).toFixed(3));
-    st.setProperty('--t', (6 + Math.random() * 8).toFixed(1) + 's'); st.setProperty('--tw', (2.5 + Math.random() * 4).toFixed(1) + 's');
-    st.setProperty('--dl', (-Math.random() * 8).toFixed(1) + 's'); st.setProperty('--rot', ((Math.random() - .5) * 90).toFixed(0) + 'deg');
-    st.setProperty('--o1', (.08 + Math.random() * .1).toFixed(2)); st.setProperty('--o2', (.35 + Math.random() * .4).toFixed(2));
-    d.appendChild(e);
-  }
-  const words = ['JWT', 'KEYS', 'GENERATE', 'COPY', 'SECURE', 'DECODE', 'VERIFY'];
-  const one = '<span>' + words.map((w, i) => i % 2 ? `<em>${w}</em><b></b>` : `${w}<b></b>`).join('') + '</span>';
-  $('.ticker-in').innerHTML = one + one;
-})();
-
-/* ================= grain texture (generated once, 4KB) ================= */
-(() => {
-  const c = document.createElement('canvas'); c.width = c.height = 140;
-  const g = c.getContext('2d'), d = g.createImageData(140, 140);
-  for (let i = 0; i < d.data.length; i += 4) { d.data[i] = d.data[i + 1] = d.data[i + 2] = 255; d.data[i + 3] = Math.random() < .5 ? 0 : Math.random() * 22; }
-  g.putImageData(d, 0, 0);
-  $('#grain').style.backgroundImage = `url(${c.toDataURL()})`;
-})();
-
 /* ================= boot ================= */
 lastKey = store.get('last', '');
-const cGen = $('[data-counter="gen"] .odo'), cDec = $('[data-counter="dec"] .odo');
-odo(cGen, 0); odo(cDec, 0);
 route();
 restart($('.nav'), 'enter');
 moveInd(); document.fonts && document.fonts.ready.then(moveInd); addEventListener('load', moveInd);
-setTimeout(() => { odo(cGen, store.get('gen', 0)); odo(cDec, store.get('dec', 0)); }, reduce ? 0 : 450);
 })();
